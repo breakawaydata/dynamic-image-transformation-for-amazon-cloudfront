@@ -45,8 +45,8 @@ jobs:
       - name: Sync Dev to S3
         working-directory: deployment
         run: |
-          aws s3 cp --recursive --acl public-read ./regional-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
-          aws s3 cp --recursive --acl public-read ./global-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive --acl public-read ./regional-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive --acl public-read ./global-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
           rm -rf ./regional-s3-assets
           rm -rf ./global-s3-assets
         env:
@@ -65,8 +65,8 @@ jobs:
       - name: Sync Prod to S3
         working-directory: deployment
         run: |
-          aws s3 cp --recursive --acl public-read ./regional-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
-          aws s3 cp --recursive --acl public-read ./global-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive --acl public-read ./regional-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive --acl public-read ./global-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
         env:
            DIST_OUTPUT_BUCKET: ${{ env.PROD_ASSETS_S3_BUCKET }}
 
