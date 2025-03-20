@@ -7,9 +7,9 @@ on:
 
 env:
   DEV_S3_ROLE: arn:aws:iam::730335393542:role/image-cache-github-actions-role
-  DEV_ASSETS_S3_BUCKET: dev-breakaway-image-solution-assets
+  DEV_ASSETS_S3_BUCKET: dev-breakaway-image-solution-assets-us-west-2
   PROD_S3_ROLE: arn:aws:iam::203918880350:role/image-cache-github-actions-role
-  PROD_ASSETS_S3_BUCKET: prod-breakaway-image-solution-assets
+  PROD_ASSETS_S3_BUCKET: prod-breakaway-image-solution-assets-us-west-2
   AWS_REGION: us-west-2
   SOLUTION_NAME: dynamic-image-transformation-for-amazon-cloudfront
   VERSION: ${{ github.ref_name }}
