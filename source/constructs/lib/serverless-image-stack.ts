@@ -464,6 +464,12 @@ export class ServerlessImageHandlerStack extends Stack {
       condition: deployCloudWatchDashboard,
     });
 
+    new CfnOutput(this, "UUID", {
+      value: commonResources.customResources.uuid,
+      description: "The UUID for the custom resource",
+      exportName: `UUID`,
+    });
+
     Aspects.of(this).add(new SuppressLambdaFunctionCfnRulesAspect());
     Tags.of(this).add("SolutionId", props.solutionId);
   }

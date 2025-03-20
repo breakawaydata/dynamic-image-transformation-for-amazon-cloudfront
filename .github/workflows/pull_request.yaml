@@ -1,0 +1,52 @@
+name: Pull Request
+on:
+    pull_request:
+
+permissions:
+  contents: read  # This is required for actions/checkout
+
+concurrency:
+  # Use github.run_id on main branch
+  # Use github.event.pull_request.number on pull requests, so it's unique per pull request
+  # Use github.ref on other branches, so it's unique per branch
+  group: ${{ github.workflow }}-${{ github.ref_protected && github.run_id || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEV_S3_ROLE: arn:aws:iam::730335393542:role/image-cache-github-actions-role
+  DEV_ASSETS_S3_BUCKET: dev-breakaway-image-solution-assets
+  PROD_S3_ROLE: arn:aws:iam::203918880350:role/image-cache-github-actions-role
+  PROD_ASSETS_S3_BUCKET: prod-breakaway-image-solution-assets
+  AWS_REGION: us-west-2
+
+jobs:
+
+    test:
+      runs-on: ubuntu-latest
+      steps:
+          - name: Checkout
+            uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4 
+          - name: Install Node.js
+            uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+            with:
+               cache: 'npm'
+               cache-dependency-path: './source'
+          - name: Test
+            working-directory: deployment
+            run: ./run-unit-tests.sh
+
+    build:
+      runs-on: ubuntu-latest
+      steps:
+          - name: Checkout
+            uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4 
+          - name: Install Node.js
+            uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+            with:
+               cache: 'npm'
+               cache-dependency-path: './source'
+          - name: Build
+            working-directory: deployment
+            run: ./build-s3-dist.sh
+            env:
+                SOLUTION_NAME: dynamic-image-transformation-for-amazon-cloudfront
