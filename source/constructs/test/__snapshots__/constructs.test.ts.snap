@@ -458,6 +458,18 @@ exports[`Dynamic Image Transformation for Amazon CloudFront Stack Snapshot 1`] =
         "Ref": "SourceBucketsParameter",
       },
     },
+    "UUID": {
+      "Description": "The UUID for the custom resource",
+      "Export": {
+        "Name": "UUID",
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "CommonResourcesCustomResourcesCustomResourceUuid64E7CCAD",
+          "UUID",
+        ],
+      },
+    },
   },
   "Parameters": {
     "AutoWebPParameter": {
