@@ -1,0 +1,70 @@
+name: Deployment
+on:
+  push:
+    branches:
+      - 'refs/tags/*'
+
+env:
+  DEV_S3_ROLE: arn:aws:iam::730335393542:role/image-cache-github-actions-role
+  DEV_ASSETS_S3_BUCKET: dev-breakaway-image-solution-assets
+  PROD_S3_ROLE: arn:aws:iam::203918880350:role/image-cache-github-actions-role
+  PROD_ASSETS_S3_BUCKET: prod-breakaway-image-solution-assets
+  AWS_REGION: us-west-2
+  SOLUTION_NAME: dynamic-image-transformation-for-amazon-cloudfront
+  VERSION: ${{ github.ref_name }}
+
+
+jobs:
+  build_and_deploy:
+    permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: read    # This is required for actions/checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          cache: 'npm'
+          cache-dependency-path: './source'
+      - name: Dump Version
+        run: echo "${{ env.VERSION }}" > ./VERSION.txt
+      - name: Build Dev
+        working-directory: deployment
+        run: ./build-s3-dist.sh
+        env:
+           DIST_OUTPUT_BUCKET: ${{ env.DEV_ASSETS_S3_BUCKET }}
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
+        with:
+          role-to-assume: ${{ env.DEV_S3_ROLE }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Sync Dev to S3
+        working-directory: deployment
+        run: |
+          aws s3 s3 cp --recursive --acl public-read ./regional-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 s3 cp --recursive --acl public-read ./global-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+        env:
+           DIST_OUTPUT_BUCKET: ${{ env.DEV_ASSETS_S3_BUCKET }}
+      - name: Build Prod
+        working-directory: deployment
+        run: ./build-s3-dist.sh
+        env:
+           DIST_OUTPUT_BUCKET: ${{ env.PROD_ASSETS_S3_BUCKET }}
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
+        with:
+          role-to-assume: ${{ env.PROD_S3_ROLE }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Sync Prod to S3
+        working-directory: deployment
+        run: |
+          aws s3 s3 cp --recursive --acl public-read ./regional-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 s3 cp --recursive --acl public-read ./global-s3-assets/* s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+        env:
+           DIST_OUTPUT_BUCKET: ${{ env.PROD_ASSETS_S3_BUCKET }}
+
+           

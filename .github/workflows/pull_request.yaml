@@ -44,7 +44,7 @@ jobs:
             uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
             with:
                cache: 'npm'
-                cache-dependency-path: './source'
+               cache-dependency-path: './source'
           - name: Build
             working-directory: deployment
             run: ./build-s3-dist.sh
