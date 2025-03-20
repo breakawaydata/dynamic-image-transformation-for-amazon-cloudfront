@@ -1,8 +1,9 @@
 name: Deployment
 on:
   push:
-    branches:
-      - 'refs/tags/*'
+    # Pattern matched against refs/tags
+    tags:        
+      - '*'  # Push events to every tag not containing /
 
 env:
   DEV_S3_ROLE: arn:aws:iam::730335393542:role/image-cache-github-actions-role
