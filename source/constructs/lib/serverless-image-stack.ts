@@ -470,28 +470,28 @@ export class ServerlessImageHandlerStack extends Stack {
       exportName: `UUID`,
     });
 
-    new CfnOutput(this, "BackendImageHandlerArn", {
-      value: backEnd.imageHandlerLambdaFunction.functionArn,
-      description: "The arn of the image handler lambda function",
-      exportName: `BackendImageHandlerArn`,
+    new CfnOutput(this, "BackendImageHandlerName", {
+      value: backEnd.imageHandlerLambdaFunction.functionName,
+      description: "The name of the image handler lambda function",
+      exportName: `BackendImageHandlerName`,
     });
 
-    new CfnOutput(this, "BackendSolutionMetricImageHandlerArn", {
-      value: backEnd.solutionsMetrics.metricsLambdaFunction.functionArn,
+    new CfnOutput(this, "BackendSolutionMetricImageHandlerName", {
+      value: backEnd.solutionsMetrics.metricsLambdaFunction.functionName,
       description: "The arn of the metrics lambda function",
-      exportName: `BackendSolutionMetricImageHandlerArn`,
+      exportName: `BackendSolutionMetricImageHandlerName`,
     });
 
-    new CfnOutput(this, "CustomResourceHandlerArn", {
-      value: commonResources.customResources.customResourceLambda.functionArn,
+    new CfnOutput(this, "CustomResourceHandlerName", {
+      value: commonResources.customResources.customResourceLambda.functionName,
       description: "The arn of the custom resource creator lambda function",
-      exportName: `CustomResourceHandlerArn`,
+      exportName: `CustomResourceHandlerName`,
     });
     
-    new CfnOutput(this, "BackendSolutionsMetricSQSQueueArn", {
-      value: backEnd.solutionsMetrics.lambdaToSQSLambda.sqsQueue.queueArn,
-      description: "The arn of the custom resource creator lambda function",
-      exportName: `BackendSolutionsMetricSQSQueueArn`,
+    new CfnOutput(this, "BackendSolutionsMetricSQSQueueName", {
+      value: backEnd.solutionsMetrics.lambdaToSQSLambda.sqsQueue.queueName,
+      description: "The name of the custom resource creator lambda function",
+      exportName: `BackendSolutionsMetricSQSQueueName`,
     });
 
     Aspects.of(this).add(new SuppressLambdaFunctionCfnRulesAspect());

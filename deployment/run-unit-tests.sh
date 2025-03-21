@@ -47,6 +47,6 @@ declare -a packages=(
 )
 for package in "${packages[@]}"; do
   cd "$package"
-  npm test -- -u
+  npm test
   prepare_jest_coverage_report "$package"
 done;
