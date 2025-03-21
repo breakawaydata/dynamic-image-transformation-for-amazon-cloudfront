@@ -7,9 +7,9 @@ on:
 
 env:
   DEV_S3_ROLE: arn:aws:iam::730335393542:role/image-cache-github-actions-role
-  DEV_ASSETS_S3_BUCKET: dev-breakaway-image-solution-assets-us-west-2
+  DEV_ASSETS_S3_BUCKET: dev-breakaway-image-solution-assets
   PROD_S3_ROLE: arn:aws:iam::203918880350:role/image-cache-github-actions-role
-  PROD_ASSETS_S3_BUCKET: prod-breakaway-image-solution-assets-us-west-2
+  PROD_ASSETS_S3_BUCKET: prod-breakaway-image-solution-assets
   AWS_REGION: us-west-2
   SOLUTION_NAME: dynamic-image-transformation-for-amazon-cloudfront
   VERSION: ${{ github.ref_name }}
@@ -45,8 +45,8 @@ jobs:
       - name: Sync Dev to S3
         working-directory: deployment
         run: |
-          aws s3 cp --recursive ./regional-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
-          aws s3 cp --recursive ./global-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive ./regional-s3-assets s3://$DIST_OUTPUT_BUCKET-${{env.AWS_REGION}}/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive ./global-s3-assets s3://$DIST_OUTPUT_BUCKET-${{env.AWS_REGION}}/$SOLUTION_NAME/$VERSION/
           rm -rf ./regional-s3-assets
           rm -rf ./global-s3-assets
         env:
@@ -65,8 +65,8 @@ jobs:
       - name: Sync Prod to S3
         working-directory: deployment
         run: |
-          aws s3 cp --recursive ./regional-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
-          aws s3 cp --recursive ./global-s3-assets s3://$DIST_OUTPUT_BUCKET/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive ./regional-s3-assets s3://$DIST_OUTPUT_BUCKET-${{env.AWS_REGION}}/$SOLUTION_NAME/$VERSION/
+          aws s3 cp --recursive ./global-s3-assets s3://$DIST_OUTPUT_BUCKET-${{env.AWS_REGION}}/$SOLUTION_NAME/$VERSION/
         env:
            DIST_OUTPUT_BUCKET: ${{ env.PROD_ASSETS_S3_BUCKET }}
 
