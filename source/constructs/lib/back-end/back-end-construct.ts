@@ -49,6 +49,8 @@ export class BackEnd extends Construct {
   public domainName: string;
   public olDomainName: string;
   public operationalDashboard: Dashboard;
+  public solutionsMetrics: SolutionsMetrics;
+  public imageHandlerLambdaFunction: NodejsFunction;
 
   constructor(scope: Construct, id: string, props: BackEndProps) {
     super(scope, id);
@@ -137,6 +139,7 @@ export class BackEnd extends Construct {
         },
       },
     });
+    this.imageHandlerLambdaFunction = imageHandlerLambdaFunction;
 
     const imageHandlerLogGroup = new LogGroup(this, "ImageHandlerLogGroup", {
       logGroupName: `/aws/lambda/${imageHandlerLambdaFunction.functionName}`,
@@ -217,6 +220,8 @@ export class BackEnd extends Construct {
         ExecutionDay.MONDAY
       ).toString(),
     });
+    this.solutionsMetrics = solutionsMetrics;
+    
 
     const conditionalCloudFrontDistributionId = Fn.conditionIf(
       props.conditions.useExistingCloudFrontDistributionCondition.logicalId,

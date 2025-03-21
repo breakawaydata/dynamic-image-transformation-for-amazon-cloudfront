@@ -470,6 +470,30 @@ export class ServerlessImageHandlerStack extends Stack {
       exportName: `UUID`,
     });
 
+    new CfnOutput(this, "BackendImageHandlerArn", {
+      value: backEnd.imageHandlerLambdaFunction.functionArn,
+      description: "The arn of the image handler lambda function",
+      exportName: `BackendImageHandlerArn`,
+    });
+
+    new CfnOutput(this, "BackendSolutionMetricImageHandlerArn", {
+      value: backEnd.solutionsMetrics.metricsLambdaFunction.functionArn,
+      description: "The arn of the metrics lambda function",
+      exportName: `BackendSolutionMetricImageHandlerArn`,
+    });
+
+    new CfnOutput(this, "CustomResourceHandlerArn", {
+      value: commonResources.customResources.customResourceLambda.functionArn,
+      description: "The arn of the custom resource creator lambda function",
+      exportName: `CustomResourceHandlerArn`,
+    });
+    
+    new CfnOutput(this, "BackendSolutionsMetricSQSQueueArn", {
+      value: backEnd.solutionsMetrics.lambdaToSQSLambda.sqsQueue.queueArn,
+      description: "The arn of the custom resource creator lambda function",
+      exportName: `BackendSolutionsMetricSQSQueueArn`,
+    });
+
     Aspects.of(this).add(new SuppressLambdaFunctionCfnRulesAspect());
     Tags.of(this).add("SolutionId", props.solutionId);
   }
