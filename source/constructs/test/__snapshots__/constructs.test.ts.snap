@@ -390,6 +390,36 @@ exports[`Dynamic Image Transformation for Amazon CloudFront Stack Snapshot 1`] =
         ],
       },
     },
+    "BackendImageHandlerName": {
+      "Description": "The name of the image handler lambda function",
+      "Export": {
+        "Name": "BackendImageHandlerName",
+      },
+      "Value": {
+        "Ref": "BackEndImageHandlerLambdaFunctionADEF7FF2",
+      },
+    },
+    "BackendSolutionMetricImageHandlerName": {
+      "Description": "The arn of the metrics lambda function",
+      "Export": {
+        "Name": "BackendSolutionMetricImageHandlerName",
+      },
+      "Value": {
+        "Ref": "BackEndSolutionMetricsMetricsLambdaF4FA4AF7",
+      },
+    },
+    "BackendSolutionsMetricSQSQueueName": {
+      "Description": "The name of the custom resource creator lambda function",
+      "Export": {
+        "Name": "BackendSolutionsMetricSQSQueueName",
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "BackEndSolutionMetricsLambdaToSqsToLambdalambdatosqsqueue60A92083",
+          "QueueName",
+        ],
+      },
+    },
     "CloudFrontDashboard": {
       "Condition": "DeployCloudWatchDashboard",
       "Description": "CloudFront metrics dashboard for the distribution.",
@@ -425,6 +455,15 @@ exports[`Dynamic Image Transformation for Amazon CloudFront Stack Snapshot 1`] =
       "Description": "Origin value returned in the Access-Control-Allow-Origin header of image handler API responses.",
       "Value": {
         "Ref": "CorsOriginParameter",
+      },
+    },
+    "CustomResourceHandlerName": {
+      "Description": "The arn of the custom resource creator lambda function",
+      "Export": {
+        "Name": "CustomResourceHandlerName",
+      },
+      "Value": {
+        "Ref": "CommonResourcesCustomResourcesCustomResourceFunction0D924235",
       },
     },
     "DemoUrl": {

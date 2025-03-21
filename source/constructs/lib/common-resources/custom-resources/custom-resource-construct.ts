@@ -64,7 +64,7 @@ export interface SetupValidateExistingDistributionProps {
 export class CustomResourcesConstruct extends Construct {
   private readonly conditions: Conditions;
   private readonly customResourceRole: Role;
-  private readonly customResourceLambda: LambdaFunction;
+  public readonly customResourceLambda: LambdaFunction;
   public readonly uuid: string;
   public regionedBucketName: string;
   public regionedBucketHash: string;

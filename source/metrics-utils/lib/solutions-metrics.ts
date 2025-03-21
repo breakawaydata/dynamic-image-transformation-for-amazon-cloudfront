@@ -27,9 +27,10 @@ import {
 export class SolutionsMetrics extends Construct {
   private metricDataQueries: MetricDataQuery[];
   private eventBridgeRule: CfnResource;
-  private metricsLambdaFunction: NodejsFunction;
+  public metricsLambdaFunction: NodejsFunction;
   private existingMetricIdentifiers: Set<string>;
   private queryDefinitionNames: Set<string>;
+  public readonly lambdaToSQSLambda: LambdaToSqsToLambda;
 
   constructor(scope: Construct, id: string, props: SolutionsMetricProps) {
     super(scope, id);
@@ -68,7 +69,7 @@ export class SolutionsMetrics extends Construct {
     props.metricDataProps?.map(this.addMetricDataQuery.bind(this));
 
     // eslint-disable-next-line no-new
-    new LambdaToSqsToLambda(this, "LambdaToSqsToLambda", {
+    this.lambdaToSQSLambda = new LambdaToSqsToLambda(this, "LambdaToSqsToLambda", {
       existingConsumerLambdaObj: ruleToLambda.lambdaFunction,
       existingProducerLambdaObj: ruleToLambda.lambdaFunction,
       queueProps: {
