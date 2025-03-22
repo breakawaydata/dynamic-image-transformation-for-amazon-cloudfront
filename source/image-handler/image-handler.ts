@@ -188,14 +188,7 @@ export class ImageHandler {
           break;
         }
         case "composite": { 
-          originalImage.composite
-          const compositeEdit = edits[edit].map((compostiteEdit) => {
-            const { input, ...options } = compostiteEdit;
-            return {
-              input: Buffer.isBuffer(input) ? input : Buffer.from(input),
-              ...options,
-            };
-          })
+          await this.applyComposite(originalImage, edits);
           break;
         }
         case "animated": {
@@ -318,6 +311,44 @@ export class ImageHandler {
     }
 
     originalImage.composite([overlayOption]);
+  }
+
+  private async applyComposite(originalImage: sharp.Sharp, edits: ImageEdits): Promise<void> {
+    let imageMetadata: sharp.Metadata = await originalImage.metadata();
+
+    if (edits.resize) {
+      const imageBuffer = await originalImage.toBuffer();
+      const resizeOptions: ResizeOptions = edits.resize;
+
+      imageMetadata = await sharp(imageBuffer).resize(resizeOptions).metadata();
+    }
+
+
+    const compositeEdits = await Promise.all(edits.composite.map(async (compostiteEdit) => {
+      const { input, bucket, key, ...options } = compostiteEdit;
+
+      if (bucket && key) {
+        const overlay = await this.getOverlayImage(bucket, key, "100", "100", "0", imageMetadata);
+        return { ...options, input: overlay };
+      } else {
+        let inputBuffer: Buffer = Buffer.isBuffer(input) ? input : Buffer.from(input);
+        const overlayMetadata = await sharp(inputBuffer).metadata();
+        if (overlayMetadata.width > imageMetadata.width || overlayMetadata.height > imageMetadata.height) {
+          const resizeOptions: ResizeOptions = {
+            fit: ImageFitTypes.INSIDE,
+          };
+          resizeOptions.width = imageMetadata.width;
+          resizeOptions.height = imageMetadata.height;
+          inputBuffer = await sharp(inputBuffer).resize(resizeOptions).toBuffer();
+        }
+        return {
+          input: inputBuffer,
+          ...options,
+        };
+      }
+    }));
+
+    originalImage.composite(compositeEdits);
   }
 
   /**
