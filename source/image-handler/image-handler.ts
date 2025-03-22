@@ -187,6 +187,17 @@ export class ImageHandler {
           this.applyCrop(originalImage, edits);
           break;
         }
+        case "composite": { 
+          originalImage.composite
+          const compositeEdit = edits[edit].map((compostiteEdit) => {
+            const { input, ...options } = compostiteEdit;
+            return {
+              input: Buffer.isBuffer(input) ? input : Buffer.from(input),
+              ...options,
+            };
+          })
+          break;
+        }
         case "animated": {
           break;
         }
