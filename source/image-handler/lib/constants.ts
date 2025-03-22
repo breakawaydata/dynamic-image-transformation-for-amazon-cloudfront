@@ -3,7 +3,6 @@
 
 export const ALTERNATE_EDIT_ALLOWLIST_ARRAY = [
   "overlayWith",
-  "overlayWithSVG",
   "smartCrop",
   "roundCrop",
   "contentModeration",
