@@ -8,6 +8,7 @@ export const ALTERNATE_EDIT_ALLOWLIST_ARRAY = [
   "contentModeration",
   "crop",
   "animated",
+  "composite"
 ] as const;
 
 const SHARP_IMAGE_OPERATIONS = {
