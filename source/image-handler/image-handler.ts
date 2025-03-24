@@ -335,7 +335,7 @@ export class ImageHandler {
         const overlayMetadata = await sharp(inputBuffer).metadata();
         if (overlayMetadata.width > imageMetadata.width || overlayMetadata.height > imageMetadata.height) {
           const resizeOptions: ResizeOptions = {
-            fit: ImageFitTypes.INSIDE,
+            fit: ImageFitTypes.FILL,
           };
           resizeOptions.width = imageMetadata.width;
           resizeOptions.height = imageMetadata.height;
