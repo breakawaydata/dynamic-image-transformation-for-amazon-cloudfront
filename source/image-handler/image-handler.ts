@@ -325,20 +325,30 @@ export class ImageHandler {
 
 
     const compositeEdits = await Promise.all(edits.composite.map(async (compostiteEdit) => {
-      const { input, bucket, key, ...options } = compostiteEdit;
+      const { input, bucket, key, resize, ...options } = compostiteEdit;
 
       if (bucket && key) {
-        const overlay = await this.getOverlayImage(bucket, key, "100", "100", "0", imageMetadata);
+        let overlay = await this.getOverlayImage(bucket, key, "100", "100", "0", imageMetadata);
+        if (resize) {
+          const newResize = this.validateResizeInputs(resize);
+          overlay = await sharp(overlay).resize(newResize).toBuffer()
+        }
         return { ...options, input: overlay };
       } else {
         let inputBuffer: Buffer = Buffer.isBuffer(input) ? input : Buffer.from(input);
+
+        if (resize) {
+          const newResize = this.validateResizeInputs(resize);
+          inputBuffer = await sharp(inputBuffer).resize(newResize).toBuffer()
+        }
+
         const overlayMetadata = await sharp(inputBuffer).metadata();
         if (overlayMetadata.width > imageMetadata.width || overlayMetadata.height > imageMetadata.height) {
           const resizeOptions: ResizeOptions = {
             fit: ImageFitTypes.FILL,
+            width: imageMetadata.width,
+            height: imageMetadata.height,
           };
-          resizeOptions.width = imageMetadata.width;
-          resizeOptions.height = imageMetadata.height;
           inputBuffer = await sharp(inputBuffer).resize(resizeOptions).toBuffer();
         }
         return {
