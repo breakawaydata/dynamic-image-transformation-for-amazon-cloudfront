@@ -2656,7 +2656,7 @@ function handler(event) {
             "Arn",
           ],
         },
-        "Runtime": "nodejs18.x",
+        "Runtime": "nodejs22.x",
         "Tags": [
           {
             "Key": "SolutionId",
