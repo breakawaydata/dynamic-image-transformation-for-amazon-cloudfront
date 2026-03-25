@@ -1,17 +1,17 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { mockAwsS3 } from "../mock";
+import { mockS3Commands } from "../mock";
 
-import Rekognition from "aws-sdk/clients/rekognition";
-import S3 from "aws-sdk/clients/s3";
+import { RekognitionClient } from "@aws-sdk/client-rekognition";
+import { S3Client } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 
 import { ImageHandler } from "../../image-handler";
 import { ImageEdits, StatusCodes, ImageRequestInfo, RequestTypes } from "../../lib";
 
-const s3Client = new S3();
-const rekognitionClient = new Rekognition();
+const s3Client = new S3Client();
+const rekognitionClient = new RekognitionClient();
 
 describe("composite", () => {
   beforeEach(() => {
@@ -74,22 +74,18 @@ describe("composite", () => {
     };
 
     // Mock
-    mockAwsS3.getObject.mockImplementationOnce(() => ({
-      promise() {
-        return Promise.resolve({
-          Body: Buffer.from(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-            "base64"
-          ),
-        });
-      },
-    }));
+    mockS3Commands.getObject.mockResolvedValue({
+      Body: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        "base64"
+      ),
+    });
 
     // Act
     const imageHandler = new ImageHandler(s3Client, rekognitionClient);
     const result = await imageHandler.applyEdits(image, edits, false);
 
-    expect(mockAwsS3.getObject).toHaveBeenCalledWith({
+    expect(mockS3Commands.getObject).toHaveBeenCalledWith({
       Bucket: "bucket",
       Key: "key",
     });
@@ -120,16 +116,12 @@ describe("composite", () => {
     };
 
     // Mock
-    mockAwsS3.getObject.mockImplementationOnce(() => ({
-      promise() {
-        return Promise.resolve({
-          Body: Buffer.from(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-            "base64"
-          ),
-        });
-      },
-    }));
+    mockS3Commands.getObject.mockResolvedValue({
+      Body: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        "base64"
+      ),
+    });
 
     // Act
     const imageHandler = new ImageHandler(s3Client, rekognitionClient);
