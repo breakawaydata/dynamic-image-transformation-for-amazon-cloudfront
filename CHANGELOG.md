@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.0.8] - 2025-10-07
+
+### Added
+
+- Added deprecation notice for S3 Object Lambda architecture usage
+
+## [7.0.7] - 2025-09-22
+
+### Security
+
+- Bumped `axios` to 1.12.2 to mitigate [CVE-2025-58754](https://avd.aquasec.com/nvd/cve-2025-58754)
+
+### Changed
+
+- Modified sourcebucketpattern to allow valid s3 bucket names
+
+### Removed
+
+- AppRegistry application at resource level
+
+## [7.0.6] - 2025-07-28
+
+### Security
+
+- Bump `form-data` to mitigate [CVE-2025-7783](https://github.com/advisories/GHSA-fjxv-7rqg-78g4)
+
+## [7.0.5] - 2025-07-07
+
+### Changed
+
+- Migrated to [AWS SDK for JavaScript v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/introduction/)
+- Bundling instruction for sharp module as per [cross-platform installation instruction](https://sharp.pixelplumbing.com/install/#npm-v10)
+- Bumped dependencies
+
+### Fixed
+
+- Return image metadata for all cases by default using [withMetadata()](https://sharp.pixelplumbing.com/api-output/#withmetadata)
+- In thumbor-styled requests, align `filters:rotate()` with sharp [rotate behavior](https://sharp.pixelplumbing.com/api-operation/#rotate), if no angle is provided `autoOrient()` will be called
+
+## [7.0.4] - 2025-06-09
+
+### Security
+
+- Bump `tar-fs` to mitigate [CVE-2025-48387](https://avd.aquasec.com/nvd/cve-2025-48387)
+- Bump `aws-cdk-lib` to mitigate [GHSA-5pq3-h73f-66hr](https://github.com/advisories/GHSA-5pq3-h73f-66hr)
+
+## [7.0.3] - 2025-05-10
+
+### Fixed
+
+- `SOLUTION_VERSION` environment variable in metrics lambda construct
+
 ## [7.0.2] - 2025-04-09
 
 ### Security
