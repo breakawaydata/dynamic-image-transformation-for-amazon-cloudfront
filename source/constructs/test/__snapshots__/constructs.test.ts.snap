@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Dynamic Image Transformation for Amazon CloudFront Stack Snapshot 1`] = `
+exports[`ServerlessImageHandlerStack Dynamic Image Transformation for Amazon CloudFront Stack Snapshot 1`] = `
 {
   "Conditions": {
     "BackEndDeployAPIGDistributionF4E75280": {
@@ -778,6 +778,12 @@ exports[`Dynamic Image Transformation for Amazon CloudFront Stack Snapshot 1`] =
             ],
           },
         },
+        "Tags": [
+          {
+            "Key": "SolutionId",
+            "Value": "S0ABC",
+          },
+        ],
       },
       "Type": "AWS::S3::AccessPoint",
     },
@@ -2019,7 +2025,7 @@ function processQueryParams(querystring) {
             "Arn",
           ],
         },
-        "Runtime": "nodejs20.x",
+        "Runtime": "nodejs22.x",
         "Tags": [
           {
             "Key": "SolutionId",
@@ -2437,6 +2443,12 @@ function handler(event) {
           ],
         },
         "State": "ENABLED",
+        "Tags": [
+          {
+            "Key": "SolutionId",
+            "Value": "S0ABC",
+          },
+        ],
         "Targets": [
           {
             "Arn": {
@@ -2638,6 +2650,18 @@ function handler(event) {
               "id": "W92",
               "reason": "No need for ReservedConcurrentExecutions, does not support any application functional logic",
             },
+            {
+              "id": "W58",
+              "reason": "The function does have permission to write CloudWatch Logs.",
+            },
+            {
+              "id": "W89",
+              "reason": "The Lambda function does not require any VPC connection at all.",
+            },
+            {
+              "id": "W92",
+              "reason": "The Lambda function does not require ReservedConcurrentExecutions.",
+            },
           ],
         },
       },
@@ -2651,6 +2675,12 @@ function handler(event) {
         "Description": "Metrics util",
         "Environment": {
           "Variables": {
+            "AWS_ACCOUNT_ID": {
+              "Ref": "AWS::AccountId",
+            },
+            "AWS_STACK_ID": {
+              "Ref": "AWS::StackId",
+            },
             "EXECUTION_DAY": {
               "Fn::If": [
                 "BackEndShortLogRetentionCondition72EA1A33",
@@ -2684,6 +2714,11 @@ function handler(event) {
           },
         },
         "Handler": "index.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "BackEndSolutionMetricsMetricsLambdaLogGroup7A09CAFB",
+          },
+        },
         "MemorySize": 128,
         "Role": {
           "Fn::GetAtt": [
@@ -2701,6 +2736,28 @@ function handler(event) {
         "Timeout": 60,
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "BackEndSolutionMetricsMetricsLambdaLogGroup7A09CAFB": {
+      "Condition": "SendAnonymousStatistics",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+          ],
+        },
+      },
+      "Properties": {
+        "RetentionInDays": 3653,
+        "Tags": [
+          {
+            "Key": "SolutionId",
+            "Value": "S0ABC",
+          },
+        ],
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
     },
     "BackEndSolutionMetricsMetricsLambdaServiceRoleDefaultPolicyEBDDA47A": {
       "Condition": "SendAnonymousStatistics",
@@ -3092,7 +3149,7 @@ function handler(event) {
             "Arn",
           ],
         },
-        "Runtime": "nodejs20.x",
+        "Runtime": "nodejs22.x",
         "Tags": [
           {
             "Key": "SolutionId",
@@ -3398,6 +3455,7 @@ function handler(event) {
         "SourceObjectKeys": [
           "Omitted to remove snapshot dependency on demo ui module hash",
         ],
+        "WaitForDistributionInvalidation": true,
       },
       "Type": "Custom::CDKBucketDeployment",
       "UpdateReplacePolicy": "Delete",
@@ -3656,7 +3714,7 @@ function handler(event) {
             "Arn",
           ],
         },
-        "Runtime": "python3.11",
+        "Runtime": "python3.13",
         "Tags": [
           {
             "Key": "SolutionId",
@@ -4099,7 +4157,7 @@ function handler(event) {
               {
                 "Ref": "BackEndImageHandlerLambdaFunctionADEF7FF2",
               },
-              "",{"label":"Lambda Errors","stat":"Sum","id":"metric"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Count","showUnits":false,"min":0},"right":{"label":"Running-Total Count","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":8,"height":8,"x":8,"y":1,"properties":{"view":"timeSeries","title":"Lambda Duration","region":"",
+              "",{"label":"Lambda Errors","id":"metric","stat":"Sum"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Count","showUnits":false,"min":0},"right":{"label":"Running-Total Count","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":8,"height":8,"x":8,"y":1,"properties":{"view":"timeSeries","title":"Lambda Duration","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -4107,7 +4165,7 @@ function handler(event) {
               {
                 "Ref": "BackEndImageHandlerLambdaFunctionADEF7FF2",
               },
-              "",{"label":"Lambda Duration","stat":"Sum","id":"metric"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Milliseconds","showUnits":false,"min":0},"right":{"label":"Running-Total Milliseconds","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":8,"height":8,"x":16,"y":1,"properties":{"view":"timeSeries","title":"Lambda Invocations","region":"",
+              "",{"label":"Lambda Duration","id":"metric","stat":"Sum"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Milliseconds","showUnits":false,"min":0},"right":{"label":"Running-Total Milliseconds","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":8,"height":8,"x":16,"y":1,"properties":{"view":"timeSeries","title":"Lambda Invocations","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -4115,7 +4173,7 @@ function handler(event) {
               {
                 "Ref": "BackEndImageHandlerLambdaFunctionADEF7FF2",
               },
-              "",{"label":"Lambda Invocations","stat":"Sum","id":"metric"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Count","showUnits":false,"min":0},"right":{"label":"Running-Total Count","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"text","width":24,"height":1,"x":0,"y":9,"properties":{"markdown":"# CloudFront"}},{"type":"metric","width":12,"height":12,"x":0,"y":10,"properties":{"view":"timeSeries","title":"CloudFront Requests","region":"",
+              "",{"label":"Lambda Invocations","id":"metric","stat":"Sum"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Count","showUnits":false,"min":0},"right":{"label":"Running-Total Count","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"text","width":24,"height":1,"x":0,"y":9,"properties":{"markdown":"# CloudFront"}},{"type":"metric","width":12,"height":12,"x":0,"y":10,"properties":{"view":"timeSeries","title":"CloudFront Requests","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -4139,7 +4197,7 @@ function handler(event) {
                   },
                 ],
               },
-              "","Region","Global",{"label":"CloudFront Requests","region":"us-east-1","stat":"Sum","id":"metric"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Count","showUnits":false,"min":0},"right":{"label":"Running-Total Count","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":12,"height":12,"x":12,"y":10,"properties":{"view":"timeSeries","title":"CloudFront Bytes Downloaded","region":"",
+              "","Region","Global",{"label":"CloudFront Requests","id":"metric","region":"us-east-1","stat":"Sum"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Count","showUnits":false,"min":0},"right":{"label":"Running-Total Count","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":12,"height":12,"x":12,"y":10,"properties":{"view":"timeSeries","title":"CloudFront Bytes Downloaded","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -4163,7 +4221,7 @@ function handler(event) {
                   },
                 ],
               },
-              "","Region","Global",{"label":"CloudFront Bytes Downloaded","region":"us-east-1","stat":"Sum","id":"metric"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Bytes","showUnits":false,"min":0},"right":{"label":"Running-Total Bytes","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":12,"height":6,"x":0,"y":22,"properties":{"view":"singleValue","title":"Cache Hit Rate","region":"",
+              "","Region","Global",{"label":"CloudFront Bytes Downloaded","id":"metric","region":"us-east-1","stat":"Sum"}],[{"label":"Total","expression":"RUNNING_SUM(metric)","yAxis":"right"}]],"yAxis":{"left":{"label":"Bytes","showUnits":false,"min":0},"right":{"label":"Running-Total Bytes","showUnits":false,"min":0}},"legend":{"position":"bottom"},"liveData":true,"period":86400,"stat":"Sum"}},{"type":"metric","width":12,"height":6,"x":0,"y":22,"properties":{"view":"singleValue","title":"Cache Hit Rate","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -4187,11 +4245,11 @@ function handler(event) {
                   },
                 ],
               },
-              "","Region","Global",{"region":"us-east-1","stat":"Sum","visible":false,"id":"cloudFrontRequests"}],["AWS/Lambda","Invocations","FunctionName","",
+              "","Region","Global",{"id":"cloudFrontRequests","visible":false,"region":"us-east-1","stat":"Sum"}],["AWS/Lambda","Invocations","FunctionName","",
               {
                 "Ref": "BackEndImageHandlerLambdaFunctionADEF7FF2",
               },
-              "",{"stat":"Sum","visible":false,"id":"lambdaInvocations"}]],"setPeriodToTimeRange":true}},{"type":"metric","width":12,"height":6,"x":12,"y":22,"properties":{"view":"singleValue","title":"Average Image Size","region":"",
+              "",{"id":"lambdaInvocations","visible":false,"stat":"Sum"}]],"setPeriodToTimeRange":true}},{"type":"metric","width":12,"height":6,"x":12,"y":22,"properties":{"view":"singleValue","title":"Average Image Size","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -4215,7 +4273,7 @@ function handler(event) {
                   },
                 ],
               },
-              "","Region","Global",{"region":"us-east-1","stat":"Sum","visible":false,"id":"cloudFrontBytesDownloaded"}],["AWS/CloudFront","Requests","DistributionId","",
+              "","Region","Global",{"id":"cloudFrontBytesDownloaded","visible":false,"region":"us-east-1","stat":"Sum"}],["AWS/CloudFront","Requests","DistributionId","",
               {
                 "Fn::If": [
                   "CommonResourcesUseExistingCloudFrontDistributionConditionEBC48184",
@@ -4235,7 +4293,7 @@ function handler(event) {
                   },
                 ],
               },
-              "","Region","Global",{"region":"us-east-1","stat":"Sum","visible":false,"id":"cloudFrontRequests"}]],"setPeriodToTimeRange":true}},{"type":"text","width":24,"height":1,"x":0,"y":28,"properties":{"markdown":"# Overall"}},{"type":"metric","width":24,"height":6,"x":0,"y":29,"properties":{"view":"singleValue","title":"Estimated Cost","region":"",
+              "","Region","Global",{"id":"cloudFrontRequests","visible":false,"region":"us-east-1","stat":"Sum"}]],"setPeriodToTimeRange":true}},{"type":"text","width":24,"height":1,"x":0,"y":28,"properties":{"markdown":"# Overall"}},{"type":"metric","width":24,"height":6,"x":0,"y":29,"properties":{"view":"singleValue","title":"Estimated Cost","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -4259,7 +4317,7 @@ function handler(event) {
                   },
                 ],
               },
-              "","Region","Global",{"region":"us-east-1","stat":"Sum","visible":false,"id":"cloudFrontBytesDownloaded"}],["AWS/CloudFront","Requests","DistributionId","",
+              "","Region","Global",{"id":"cloudFrontBytesDownloaded","visible":false,"region":"us-east-1","stat":"Sum"}],["AWS/CloudFront","Requests","DistributionId","",
               {
                 "Fn::If": [
                   "CommonResourcesUseExistingCloudFrontDistributionConditionEBC48184",
@@ -4279,15 +4337,15 @@ function handler(event) {
                   },
                 ],
               },
-              "","Region","Global",{"region":"us-east-1","stat":"Sum","visible":false,"id":"cloudFrontRequests"}],["AWS/Lambda","Duration","FunctionName","",
+              "","Region","Global",{"id":"cloudFrontRequests","visible":false,"region":"us-east-1","stat":"Sum"}],["AWS/Lambda","Duration","FunctionName","",
               {
                 "Ref": "BackEndImageHandlerLambdaFunctionADEF7FF2",
               },
-              "",{"stat":"Sum","visible":false,"id":"lambdaDuration"}],["AWS/Lambda","Invocations","FunctionName","",
+              "",{"id":"lambdaDuration","visible":false,"stat":"Sum"}],["AWS/Lambda","Invocations","FunctionName","",
               {
                 "Ref": "BackEndImageHandlerLambdaFunctionADEF7FF2",
               },
-              "",{"stat":"Sum","visible":false,"id":"lambdaInvocations"}]],"setPeriodToTimeRange":true,"singleValueFullPrecision":true}}]}",
+              "",{"id":"lambdaInvocations","visible":false,"stat":"Sum"}]],"setPeriodToTimeRange":true,"singleValueFullPrecision":true}}]}",
             ],
           ],
         },
