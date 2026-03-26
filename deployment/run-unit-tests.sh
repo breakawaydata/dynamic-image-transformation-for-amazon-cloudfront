@@ -30,12 +30,28 @@ prepare_jest_coverage_report() {
   mv coverage $coverage_report_path
 }
 
+# container tests need permission to pull amazon linux base image
+if [ "$SKIP_ECR_LOGIN" != "true" ]; then
+  aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+fi
+
+headline "[Setup] Install workspace dependencies"
+cd "$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/../source"
+npm ci
+
 headline "[Setup] Configure paths"
 template_dir="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 cdk_dir="$template_dir/../source/constructs"
 image_handler_dir="$template_dir/../source/image-handler"
 custom_resource_dir="$template_dir/../source/custom-resource"
 metrics_utils_dir="$template_dir/../source/metrics-utils"
+data_models_dir="$template_dir/../source/data-models"
+management_lambda_dir="$template_dir/../source/management-lambda"
+utility_lambda_dir="$template_dir/../source/utility-lambda"
+container_dir="$template_dir/../source/container"
+admin_ui_dir="$template_dir/../source/admin-ui"
+v8_custom_resource_dir="$template_dir/../source/v8-custom-resource"
+solution_utils_dir="$template_dir/../source/solution-utils"
 coverage_reports_top_path="$template_dir/../source/test/coverage-reports"
 
 headline "[Tests] Run unit tests"
@@ -44,9 +60,23 @@ declare -a packages=(
   "$image_handler_dir"
   "$custom_resource_dir"
   "$metrics_utils_dir"
+  "$data_models_dir"
+  "$management_lambda_dir"
+  "$utility_lambda_dir"
+  "$v8_custom_resource_dir"
+  "$solution_utils_dir"
 )
+
+# Container and admin-ui tests require Docker/ECR access
+if [ "$SKIP_ECR_LOGIN" != "true" ]; then
+  packages+=("$container_dir" "$admin_ui_dir")
+fi
+
+# Ensure admin-ui/build exists for CDK snapshot tests
+mkdir -p "$admin_ui_dir/build"
+
 for package in "${packages[@]}"; do
   cd "$package"
-  npm test
+  NODE_OPTIONS="--max-old-space-size=8192" npm test
   prepare_jest_coverage_report "$package"
 done;
