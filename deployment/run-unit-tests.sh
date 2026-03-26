@@ -31,7 +31,13 @@ prepare_jest_coverage_report() {
 }
 
 # container tests need permission to pull amazon linux base image
-aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+if [ "$SKIP_ECR_LOGIN" != "true" ]; then
+  aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+fi
+
+headline "[Setup] Install workspace dependencies"
+cd "$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/../source"
+npm ci
 
 headline "[Setup] Configure paths"
 template_dir="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -57,13 +63,20 @@ declare -a packages=(
   "$data_models_dir"
   "$management_lambda_dir"
   "$utility_lambda_dir"
-  "$container_dir"
-  "$admin_ui_dir"
   "$v8_custom_resource_dir"
   "$solution_utils_dir"
 )
+
+# Container and admin-ui tests require Docker/ECR access
+if [ "$SKIP_ECR_LOGIN" != "true" ]; then
+  packages+=("$container_dir" "$admin_ui_dir")
+fi
+
+# Ensure admin-ui/build exists for CDK snapshot tests
+mkdir -p "$admin_ui_dir/build"
+
 for package in "${packages[@]}"; do
   cd "$package"
-  npm test
+  NODE_OPTIONS="--max-old-space-size=8192" npm test
   prepare_jest_coverage_report "$package"
 done;

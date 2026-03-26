@@ -34,6 +34,8 @@ jobs:
           - name: Test
             working-directory: deployment
             run: ./run-unit-tests.sh
+            env:
+              SKIP_ECR_LOGIN: "true"
 
     build:
       runs-on: ubuntu-latest
