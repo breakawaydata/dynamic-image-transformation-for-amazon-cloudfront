@@ -135,6 +135,26 @@ export class ApiGatewayArchitecture {
         { Enabled: false },
       ],
     });
+    cfnDistribution.addPropertyOverride("DistributionConfig.Aliases", {
+      "Fn::If": [
+        props.conditions.useCustomDomainCondition.logicalId,
+        [props.customDomainName],
+        { Ref: "AWS::NoValue" },
+      ],
+    });
+    cfnDistribution.addPropertyOverride("DistributionConfig.ViewerCertificate", {
+      "Fn::If": [
+        props.conditions.useCustomDomainCondition.logicalId,
+        {
+          AcmCertificateArn: props.certificateArn,
+          SslSupportMethod: "sni-only",
+          MinimumProtocolVersion: "TLSv1.2_2021",
+        },
+        {
+          CloudFrontDefaultCertificate: true,
+        },
+      ],
+    });
     Aspects.of(cfnDistribution).add(
       new ConditionAspect(
         new CfnCondition(scope, "DeployAPIGDistribution", {

@@ -26,6 +26,7 @@ export interface Conditions {
   readonly disableS3ObjectLambdaCondition: CfnCondition;
   readonly isLogRetentionPeriodInfinite: CfnCondition;
   readonly useExistingCloudFrontDistributionCondition: CfnCondition;
+  readonly useCustomDomainCondition: CfnCondition;
 }
 
 /**
@@ -70,6 +71,9 @@ export class CommonResources extends Construct {
       }),
       useExistingCloudFrontDistributionCondition: new CfnCondition(this, "UseExistingCloudFrontDistributionCondition", {
         expression: Fn.conditionEquals(props.useExistingCloudFrontDistribution, "Yes"),
+      }),
+      useCustomDomainCondition: new CfnCondition(this, "UseCustomDomainCondition", {
+        expression: Fn.conditionNot(Fn.conditionEquals(props.customDomainName, "")),
       }),
     };
 

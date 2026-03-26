@@ -183,6 +183,32 @@ export class ServerlessImageHandlerStack extends Stack {
     console.warn("📋 Default value is 'No' - recommended for all new deployments");
     console.warn("=".repeat(80) + "\n");
 
+    const customDomainNameParameter = new CfnParameter(this, "CustomDomainNameParameter", {
+      type: "String",
+      description:
+        "Optional custom domain name (e.g. images.example.com) to use as an alternate domain name (CNAME) for the CloudFront distribution. Leave empty to use the default CloudFront domain. When set, CertificateArnParameter must also be provided.",
+      default: "",
+    });
+
+    const certificateArnParameter = new CfnParameter(this, "CertificateArnParameter", {
+      type: "String",
+      description:
+        "The ARN of an ACM certificate in us-east-1 for the custom domain name. Required when CustomDomainNameParameter is set.",
+      default: "",
+      allowedPattern: "^$|^arn:aws:acm:us-east-1:[0-9]{12}:certificate/[a-f0-9-]+$",
+    });
+
+    new CfnRule(this, "CustomDomainCertificateRequiredRule", {
+      ruleCondition: Fn.conditionNot(Fn.conditionEquals(customDomainNameParameter.valueAsString, "")),
+      assertions: [
+        {
+          assert: Fn.conditionNot(Fn.conditionEquals(certificateArnParameter.valueAsString, "")),
+          assertDescription:
+            "If 'CustomDomainName' is set, 'CertificateArn' must be provided.",
+        },
+      ],
+    });
+
     const useExistingCloudFrontDistribution = new CfnParameter(this, "UseExistingCloudFrontDistributionParameter", {
       type: "String",
       description:
@@ -250,6 +276,8 @@ export class ServerlessImageHandlerStack extends Stack {
       enableS3ObjectLambda: enableS3ObjectLambdaParameter.valueAsString,
       useExistingCloudFrontDistribution: useExistingCloudFrontDistribution.valueAsString as YesNo,
       existingCloudFrontDistributionId: existingCloudFrontDistributionId.valueAsString,
+      customDomainName: customDomainNameParameter.valueAsString,
+      certificateArn: certificateArnParameter.valueAsString,
     };
 
     const commonResources = new CommonResources(this, "CommonResources", {
@@ -377,6 +405,13 @@ export class ServerlessImageHandlerStack extends Stack {
             Parameters: [autoWebPParameter.logicalId],
           },
           {
+            Label: { default: "Custom Domain" },
+            Parameters: [
+              customDomainNameParameter.logicalId,
+              certificateArnParameter.logicalId,
+            ],
+          },
+          {
             Label: { default: "CloudFront" },
             Parameters: [
               originShieldRegionParameter.logicalId,
@@ -425,6 +460,12 @@ export class ServerlessImageHandlerStack extends Stack {
           },
           [existingCloudFrontDistributionId.logicalId]: {
             default: "Existing CloudFront Distribution Id",
+          },
+          [customDomainNameParameter.logicalId]: {
+            default: "Custom Domain Name",
+          },
+          [certificateArnParameter.logicalId]: {
+            default: "ACM Certificate ARN",
           },
         },
       },
