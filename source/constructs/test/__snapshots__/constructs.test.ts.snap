@@ -1287,6 +1287,11 @@ function processQueryParams(querystring) {
             },
           ],
         },
+        "guard": {
+          "SuppressedRules": [
+            "IAM_NO_INLINE_POLICY_CHECK",
+          ],
+        },
       },
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -1387,6 +1392,11 @@ function processQueryParams(querystring) {
               "id": "W87",
               "reason": "Cache not enabled, using CloudFront for caching viewer response",
             },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "API_GW_CACHE_ENABLED_AND_ENCRYPTED",
           ],
         },
       },
@@ -4104,7 +4114,11 @@ function handler(event) {
                     "Fn::Join": [
                       "",
                       [
-                        "arn:aws:cloudfront::",
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":cloudfront::",
                         {
                           "Ref": "AWS::AccountId",
                         },
@@ -4133,6 +4147,42 @@ function handler(event) {
                     },
                     "/*",
                   ],
+                ],
+              },
+            },
+            {
+              "Action": "s3:ListBucket",
+              "Condition": {
+                "StringEquals": {
+                  "AWS:SourceArn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":cloudfront::",
+                        {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":distribution/",
+                        {
+                          "Ref": "FrontEndDistributionToS3CloudFrontDistribution15FE13D0",
+                        },
+                      ],
+                    ],
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudfront.amazonaws.com",
+              },
+              "Resource": {
+                "Fn::GetAtt": [
+                  "FrontEndDistributionToS3S3Bucket3A171D78",
+                  "Arn",
                 ],
               },
             },

@@ -2401,13 +2401,6 @@ Temporary Password: <strong>{####}</strong>
             },
           ],
         },
-        "OwnershipControls": {
-          "Rules": [
-            {
-              "ObjectOwnership": "ObjectWriter",
-            },
-          ],
-        },
         "PublicAccessBlockConfiguration": {
           "BlockPublicAcls": true,
           "BlockPublicPolicy": true,
@@ -2661,7 +2654,11 @@ Temporary Password: <strong>{####}</strong>
                     "Fn::Join": [
                       "",
                       [
-                        "arn:aws:cloudfront::",
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":cloudfront::",
                         {
                           "Ref": "AWS::AccountId",
                         },
@@ -2690,6 +2687,42 @@ Temporary Password: <strong>{####}</strong>
                     },
                     "/*",
                   ],
+                ],
+              },
+            },
+            {
+              "Action": "s3:ListBucket",
+              "Condition": {
+                "StringEquals": {
+                  "AWS:SourceArn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":cloudfront::",
+                        {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":distribution/",
+                        {
+                          "Ref": "WebDistributionAdminUIDistributionToS3CloudFrontDistribution6FD651BA",
+                        },
+                      ],
+                    ],
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudfront.amazonaws.com",
+              },
+              "Resource": {
+                "Fn::GetAtt": [
+                  "WebDistributionAdminUIDistributionToS3S3BucketBEF73512",
+                  "Arn",
                 ],
               },
             },

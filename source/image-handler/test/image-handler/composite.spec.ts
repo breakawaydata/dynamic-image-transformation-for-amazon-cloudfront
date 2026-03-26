@@ -15,12 +15,8 @@ const rekognitionClient = new RekognitionClient();
 
 describe("composite", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    process.env.SOURCE_BUCKETS = "validBucket, sourceBucket, bucket, sample-bucket";
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
+    process.env.SOURCE_BUCKETS = "validBucket, sourceBucket, bucket, sample-bucket";
   });
 
   it("Should pass if an edit with composite greater then original image width/height", async () => {
