@@ -242,6 +242,26 @@ export class S3ObjectLambdaArchitecture {
         { Enabled: false },
       ],
     });
+    cfnDistribution.addPropertyOverride("DistributionConfig.Aliases", {
+      "Fn::If": [
+        props.conditions.useCustomDomainCondition.logicalId,
+        [props.customDomainName],
+        { Ref: "AWS::NoValue" },
+      ],
+    });
+    cfnDistribution.addPropertyOverride("DistributionConfig.ViewerCertificate", {
+      "Fn::If": [
+        props.conditions.useCustomDomainCondition.logicalId,
+        {
+          AcmCertificateArn: props.certificateArn,
+          SslSupportMethod: "sni-only",
+          MinimumProtocolVersion: "TLSv1.2_2021",
+        },
+        {
+          CloudFrontDefaultCertificate: true,
+        },
+      ],
+    });
     scope.olDomainName = Fn.conditionIf(
       props.conditions.useExistingCloudFrontDistributionCondition.logicalId,
       props.existingDistribution.distributionDomainName,

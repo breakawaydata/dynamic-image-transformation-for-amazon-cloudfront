@@ -139,6 +139,18 @@ exports[`ServerlessImageHandlerStack Dynamic Image Transformation for Amazon Clo
         "Infinite",
       ],
     },
+    "CommonResourcesUseCustomDomainCondition430509C5": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "CustomDomainNameParameter",
+            },
+            "",
+          ],
+        },
+      ],
+    },
     "CommonResourcesUseExistingCloudFrontDistributionConditionEBC48184": {
       "Fn::Equals": [
         {
@@ -257,6 +269,15 @@ exports[`ServerlessImageHandlerStack Dynamic Image Transformation for Amazon Clo
         },
         {
           "Label": {
+            "default": "Custom Domain",
+          },
+          "Parameters": [
+            "CustomDomainNameParameter",
+            "CertificateArnParameter",
+          ],
+        },
+        {
+          "Label": {
             "default": "CloudFront",
           },
           "Parameters": [
@@ -271,6 +292,9 @@ exports[`ServerlessImageHandlerStack Dynamic Image Transformation for Amazon Clo
         "AutoWebPParameter": {
           "default": "AutoWebP",
         },
+        "CertificateArnParameter": {
+          "default": "ACM Certificate ARN",
+        },
         "CloudFrontPriceClassParameter": {
           "default": "CloudFront PriceClass",
         },
@@ -279,6 +303,9 @@ exports[`ServerlessImageHandlerStack Dynamic Image Transformation for Amazon Clo
         },
         "CorsOriginParameter": {
           "default": "CORS Origin",
+        },
+        "CustomDomainNameParameter": {
+          "default": "Custom Domain Name",
         },
         "DeployDemoUIParameter": {
           "default": "Deploy Demo UI",
@@ -525,6 +552,12 @@ exports[`ServerlessImageHandlerStack Dynamic Image Transformation for Amazon Clo
       "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
+    "CertificateArnParameter": {
+      "AllowedPattern": "^$|^arn:aws:acm:us-east-1:[0-9]{12}:certificate/[a-f0-9-]+$",
+      "Default": "",
+      "Description": "The ARN of an ACM certificate in us-east-1 for the custom domain name. Required when CustomDomainNameParameter is set.",
+      "Type": "String",
+    },
     "CloudFrontPriceClassParameter": {
       "AllowedValues": [
         "PriceClass_All",
@@ -547,6 +580,11 @@ exports[`ServerlessImageHandlerStack Dynamic Image Transformation for Amazon Clo
     "CorsOriginParameter": {
       "Default": "*",
       "Description": "If you selected 'Yes' above, please specify an origin value here. A wildcard (*) value will support any origin. We recommend specifying an origin (i.e. https://example.domain) to restrict cross-site access to your API.",
+      "Type": "String",
+    },
+    "CustomDomainNameParameter": {
+      "Default": "",
+      "Description": "Optional custom domain name (e.g. images.example.com) to use as an alternate domain name (CNAME) for the CloudFront distribution. Leave empty to use the default CloudFront domain. When set, CertificateArnParameter must also be provided.",
       "Type": "String",
     },
     "DeployDemoUIParameter": {
@@ -962,6 +1000,19 @@ function processQueryParams(querystring) {
       },
       "Properties": {
         "DistributionConfig": {
+          "Aliases": {
+            "Fn::If": [
+              "CommonResourcesUseCustomDomainCondition430509C5",
+              [
+                {
+                  "Ref": "CustomDomainNameParameter",
+                },
+              ],
+              {
+                "Ref": "AWS::NoValue",
+              },
+            ],
+          },
           "Comment": "Image Handler Distribution for Dynamic Image Transformation for Amazon CloudFront",
           "CustomErrorResponses": [
             {
@@ -1085,6 +1136,21 @@ function processQueryParams(querystring) {
           ],
           "PriceClass": {
             "Ref": "CloudFrontPriceClassParameter",
+          },
+          "ViewerCertificate": {
+            "Fn::If": [
+              "CommonResourcesUseCustomDomainCondition430509C5",
+              {
+                "AcmCertificateArn": {
+                  "Ref": "CertificateArnParameter",
+                },
+                "MinimumProtocolVersion": "TLSv1.2_2021",
+                "SslSupportMethod": "sni-only",
+              },
+              {
+                "CloudFrontDefaultCertificate": true,
+              },
+            ],
           },
         },
         "Tags": [
@@ -1619,6 +1685,19 @@ function processQueryParams(querystring) {
       },
       "Properties": {
         "DistributionConfig": {
+          "Aliases": {
+            "Fn::If": [
+              "CommonResourcesUseCustomDomainCondition430509C5",
+              [
+                {
+                  "Ref": "CustomDomainNameParameter",
+                },
+              ],
+              {
+                "Ref": "AWS::NoValue",
+              },
+            ],
+          },
           "Comment": "Image Handler Distribution for Dynamic Image Transformation for Amazon CloudFront",
           "CustomErrorResponses": [
             {
@@ -1755,6 +1834,21 @@ function processQueryParams(querystring) {
           ],
           "PriceClass": {
             "Ref": "CloudFrontPriceClassParameter",
+          },
+          "ViewerCertificate": {
+            "Fn::If": [
+              "CommonResourcesUseCustomDomainCondition430509C5",
+              {
+                "AcmCertificateArn": {
+                  "Ref": "CertificateArnParameter",
+                },
+                "MinimumProtocolVersion": "TLSv1.2_2021",
+                "SslSupportMethod": "sni-only",
+              },
+              {
+                "CloudFrontDefaultCertificate": true,
+              },
+            ],
           },
         },
         "Tags": [
@@ -4443,6 +4537,37 @@ function handler(event) {
           "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
         },
       ],
+    },
+    "CustomDomainCertificateRequiredRule": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Equals": [
+                  {
+                    "Ref": "CertificateArnParameter",
+                  },
+                  "",
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "If 'CustomDomainName' is set, 'CertificateArn' must be provided.",
+        },
+      ],
+      "RuleCondition": {
+        "Fn::Not": [
+          {
+            "Fn::Equals": [
+              {
+                "Ref": "CustomDomainNameParameter",
+              },
+              "",
+            ],
+          },
+        ],
+      },
     },
     "ExistingDistributionIdRequiredRule": {
       "Assertions": [
