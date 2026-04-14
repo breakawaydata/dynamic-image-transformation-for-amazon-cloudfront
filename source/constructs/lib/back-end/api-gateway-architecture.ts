@@ -19,6 +19,7 @@ import {
   Distribution,
   FunctionRuntime,
   IDistribution,
+  ResponseHeadersPolicy,
 } from "aws-cdk-lib/aws-cloudfront";
 import { HttpOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
@@ -78,6 +79,7 @@ export class ApiGatewayArchitecture {
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         originRequestPolicy: props.originRequestPolicy,
         cachePolicy: props.cachePolicy,
+        responseHeadersPolicy: ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT,
         functionAssociations: [
           {
             function: requestModifierFunction,
