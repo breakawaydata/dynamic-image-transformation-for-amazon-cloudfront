@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "types": ["node"]
+  },
+  "include": [
+    "lib-entry.ts",
+    "image-handler.ts",
+    "image-request.ts",
+    "secret-provider.ts",
+    "thumbor-mapper.ts",
+    "query-param-mapper.ts",
+    "lib/**/*.ts"
+  ],
+  "exclude": [
+    "index.ts",
+    "test/**",
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

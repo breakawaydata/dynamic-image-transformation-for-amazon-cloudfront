@@ -1,0 +1,70 @@
+name: Release @breakawaydata/dynamic-image-transformation
+
+# Publishes source/image-handler as an npm package to GitHub Packages.
+# Triggers on the same vX.Y.Z tag push that drives the Lambda/S3 deployment,
+# so the library version always tracks the Lambda release. Also supports
+# manual workflow_dispatch for backfilling existing tags.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish (e.g. v8.0.5). Must already exist.'
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: source/image-handler
+    steps:
+      - name: Resolve ref
+        id: resolve
+        run: |
+          if [[ -n "${{ inputs.tag }}" ]]; then
+            echo "ref=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            echo "version=${GITHUB_REF_NAME:-${{ inputs.tag }}}" >> /dev/null
+            version="${{ inputs.tag }}"
+          else
+            echo "ref=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            version="${{ github.ref_name }}"
+          fi
+          # Strip leading 'v' for npm semver
+          echo "version=${version#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.ref }}
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@breakawaydata'
+          cache: 'npm'
+          cache-dependency-path: source/image-handler/package-lock.json
+
+      - name: Pin package version to tag
+        run: npm version "${{ steps.resolve.outputs.version }}" --no-git-tag-version --allow-same-version
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
