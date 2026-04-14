@@ -20,6 +20,7 @@ import {
   Distribution,
   CfnOriginAccessControl,
   IDistribution,
+  ResponseHeadersPolicy,
 } from "aws-cdk-lib/aws-cloudfront";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Aspects, Aws, CfnCondition, Duration, Fn } from "aws-cdk-lib";
@@ -142,6 +143,7 @@ export class S3ObjectLambdaArchitecture {
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         originRequestPolicy: props.originRequestPolicy,
         cachePolicy: props.cachePolicy,
+        responseHeadersPolicy: ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT,
         functionAssociations: [
           {
             function: responseModifierCloudFrontFunction,

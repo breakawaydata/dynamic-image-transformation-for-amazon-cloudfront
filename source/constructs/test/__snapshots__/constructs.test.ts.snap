@@ -1059,6 +1059,7 @@ function processQueryParams(querystring) {
             "OriginRequestPolicyId": {
               "Ref": "BackEndOriginRequestPolicy771345D7",
             },
+            "ResponseHeadersPolicyId": "5cc3b908-e619-4b99-88e5-2cf7f45965bd",
             "TargetOriginId": "TestStackBackEndImageHandlerCloudFrontApiGatewayLambdaCloudFrontToApiGatewayCloudFrontDistributionOrigin1A053AEB7",
             "ViewerProtocolPolicy": "redirect-to-https",
           },
@@ -1753,6 +1754,7 @@ function processQueryParams(querystring) {
             "OriginRequestPolicyId": {
               "Ref": "BackEndOriginRequestPolicy771345D7",
             },
+            "ResponseHeadersPolicyId": "5cc3b908-e619-4b99-88e5-2cf7f45965bd",
             "TargetOriginId": "TestStackBackEndImageHandlerCloudFrontDistributionOrigin1781ABF9C",
             "ViewerProtocolPolicy": "redirect-to-https",
           },
