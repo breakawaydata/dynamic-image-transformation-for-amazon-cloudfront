@@ -22,23 +22,18 @@ jobs:
     permissions:
       contents: read
       packages: write
-    defaults:
-      run:
-        working-directory: source/image-handler
     steps:
       - name: Resolve ref
         id: resolve
         run: |
           if [[ -n "${{ inputs.tag }}" ]]; then
-            echo "ref=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "version=${GITHUB_REF_NAME:-${{ inputs.tag }}}" >> /dev/null
-            version="${{ inputs.tag }}"
+            tag="${{ inputs.tag }}"
           else
-            echo "ref=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            version="${{ github.ref_name }}"
+            tag="${{ github.ref_name }}"
           fi
+          echo "ref=$tag" >> "$GITHUB_OUTPUT"
           # Strip leading 'v' for npm semver
-          echo "version=${version#v}" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,15 +51,19 @@ jobs:
           cache-dependency-path: source/image-handler/package-lock.json
 
       - name: Pin package version to tag
+        working-directory: source/image-handler
         run: npm version "${{ steps.resolve.outputs.version }}" --no-git-tag-version --allow-same-version
 
       - name: Install
+        working-directory: source/image-handler
         run: npm ci
 
       - name: Build
+        working-directory: source/image-handler
         run: npm run build
 
       - name: Publish
+        working-directory: source/image-handler
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
