@@ -26,7 +26,9 @@ export class FrontEndConstruct extends Construct {
     super(scope, id);
 
     const cloudFrontToS3 = new CloudFrontToS3(this, "DistributionToS3", {
-      bucketProps: { serverAccessLogsBucket: undefined },
+      // enforceSSL adds a bucket policy that denies non-HTTPS (aws:SecureTransport=false)
+      // access, satisfying the "S3 buckets allow only HTTPS traffic" security control.
+      bucketProps: { serverAccessLogsBucket: undefined, enforceSSL: true },
       cloudFrontDistributionProps: {
         comment: "Demo UI Distribution for Dynamic Image Transformation for Amazon CloudFront",
         enableLogging: true,
